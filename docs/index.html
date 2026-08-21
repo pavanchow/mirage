@@ -171,6 +171,80 @@
     h1 { font-size: 38px; }
     .grid { grid-template-columns: 1fr; }
     header.hero { padding: 80px 0 56px; }
+    .demo-grid { grid-template-columns: 1fr; }
+  }
+  .demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 28px;
+    align-items: start;
+  }
+  .demo-editor {
+    display: flex;
+    flex-direction: column;
+  }
+  #asm-input {
+    width: 100%;
+    min-height: 320px;
+    resize: vertical;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    tab-size: 4;
+  }
+  #asm-input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .demo-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  #asm-run {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #asm-run:hover { opacity: 0.85; }
+  #asm-run:active { opacity: 0.7; }
+  #asm-status {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .demo-output {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .demo-output-block h4 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  .demo-output-block pre {
+    margin: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 13px;
+  }
+  #asm-output.demo-error {
+    color: var(--accent);
   }
 </style>
 </head>
@@ -187,6 +261,36 @@
     <p class="lede">Its own instruction set, a text assembler, and a runner. A value stack, a call stack, local variables, and a compact binary format, with no panics on bad input.</p>
   </div>
 </header>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>Try it</h2>
+    <p>This box assembles and runs Mirage assembly right in the page. It is a JavaScript port of the same assembler and stack machine described below, not a server call. The example below computes a factorial and prints 120.</p>
+    <div class="demo-grid">
+      <div class="demo-editor">
+        <textarea id="asm-input" spellcheck="false" autocomplete="off" aria-label="Mirage assembly source"></textarea>
+        <div class="demo-actions">
+          <button id="asm-run" type="button">Assemble and run</button>
+          <span id="asm-status"></span>
+        </div>
+      </div>
+      <div class="demo-output">
+        <div class="demo-output-block">
+          <h4>Output</h4>
+          <pre id="asm-output">-</pre>
+        </div>
+        <div class="demo-output-block">
+          <h4>Disassembly</h4>
+          <pre id="asm-disasm">-</pre>
+        </div>
+        <div class="demo-output-block">
+          <h4>Final stack</h4>
+          <pre id="asm-stack">-</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section>
   <div class="wrap">
@@ -264,6 +368,317 @@ mirage disasm program.mbc</pre>
 <footer>
   By Pavan Nallamothu.
 </footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var LOCALS_SIZE = 256;
+  var MAX_STEPS = 200000;
+
+  function AsmError(message) {
+    this.message = message;
+  }
+  function VmError(message) {
+    this.message = message;
+  }
+
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function stripComment(line) {
+    var idx = line.indexOf(";");
+    var s = idx >= 0 ? line.slice(0, idx) : line;
+    return s.trim();
+  }
+
+  function assemble(source) {
+    var labels = Object.create(null);
+    var instrLines = [];
+    var lines = source.split("\n");
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = stripComment(lines[i]);
+      if (line === "") continue;
+      if (line.charAt(line.length - 1) === ":") {
+        var name = line.slice(0, -1).trim();
+        if (Object.prototype.hasOwnProperty.call(labels, name)) {
+          throw new AsmError("line " + (i + 1) + ": duplicate label '" + name + "'");
+        }
+        labels[name] = instrLines.length;
+        continue;
+      }
+      instrLines.push([i + 1, line]);
+    }
+
+    var ops = [];
+    for (var j = 0; j < instrLines.length; j++) {
+      ops.push(parseInstruction(instrLines[j][0], instrLines[j][1], labels));
+    }
+    return ops;
+  }
+
+  function parseInstruction(lineno, text, labels) {
+    var parts = text.split(/\s+/).filter(function (p) { return p.length > 0; });
+    var mnemonic = (parts[0] || "").toUpperCase();
+    var rest = parts.slice(1);
+
+    function wantInt() {
+      var tok = rest[0];
+      if (tok === undefined) {
+        throw new AsmError("line " + lineno + ": missing operand in '" + text + "'");
+      }
+      if (!/^-?[0-9]+$/.test(tok)) {
+        throw new AsmError("line " + lineno + ": bad operand in '" + text + "'");
+      }
+      return parseInt(tok, 10);
+    }
+
+    function wantLabel() {
+      var tok = rest[0];
+      if (tok === undefined) {
+        throw new AsmError("line " + lineno + ": missing operand in '" + text + "'");
+      }
+      if (!Object.prototype.hasOwnProperty.call(labels, tok)) {
+        throw new AsmError("undefined label '" + tok + "'");
+      }
+      return labels[tok];
+    }
+
+    switch (mnemonic) {
+      case "PUSH": return { op: "PUSH", n: wantInt() };
+      case "POP": return { op: "POP" };
+      case "DUP": return { op: "DUP" };
+      case "ADD": return { op: "ADD" };
+      case "SUB": return { op: "SUB" };
+      case "MUL": return { op: "MUL" };
+      case "DIV": return { op: "DIV" };
+      case "MOD": return { op: "MOD" };
+      case "NEG": return { op: "NEG" };
+      case "EQ": return { op: "EQ" };
+      case "LT": return { op: "LT" };
+      case "GT": return { op: "GT" };
+      case "LOAD": return { op: "LOAD", n: wantInt() };
+      case "STORE": return { op: "STORE", n: wantInt() };
+      case "JMP": return { op: "JMP", n: wantLabel() };
+      case "JZ": return { op: "JZ", n: wantLabel() };
+      case "JNZ": return { op: "JNZ", n: wantLabel() };
+      case "CALL": return { op: "CALL", n: wantLabel() };
+      case "RET": return { op: "RET" };
+      case "PRINT": return { op: "PRINT" };
+      case "HALT": return { op: "HALT" };
+      default:
+        throw new AsmError("line " + lineno + ": unknown instruction '" + text + "'");
+    }
+  }
+
+  function fmtOp(op, idx) {
+    var opnd = Object.prototype.hasOwnProperty.call(op, "n") ? " " + op.n : "";
+    var idxStr = String(idx);
+    while (idxStr.length < 4) idxStr = "0" + idxStr;
+    return idxStr + ": " + op.op + opnd;
+  }
+
+  function truncDiv(a, b) {
+    return Math.trunc(a / b);
+  }
+
+  function runProgram(ops) {
+    var stack = [];
+    var callStack = [];
+    var locals = new Array(LOCALS_SIZE).fill(0);
+    var pc = 0;
+    var output = [];
+    var steps = 0;
+
+    function pop() {
+      if (stack.length === 0) throw new VmError("stack underflow");
+      return stack.pop();
+    }
+    function localIndex(idx) {
+      if (idx < 0 || idx >= LOCALS_SIZE) {
+        throw new VmError("local index out of bounds: " + idx);
+      }
+      return idx;
+    }
+    function binary(f) {
+      var b = pop();
+      var a = pop();
+      stack.push(f(a, b));
+    }
+
+    for (;;) {
+      steps++;
+      if (steps > MAX_STEPS) {
+        throw new VmError("step limit exceeded (" + MAX_STEPS + "), likely an infinite loop");
+      }
+      if (pc < 0 || pc >= ops.length) {
+        throw new VmError("program ended without HALT");
+      }
+      var op = ops[pc];
+      var nextPc = pc + 1;
+
+      switch (op.op) {
+        case "PUSH": stack.push(op.n); break;
+        case "POP": pop(); break;
+        case "DUP": {
+          if (stack.length === 0) throw new VmError("stack underflow");
+          stack.push(stack[stack.length - 1]);
+          break;
+        }
+        case "ADD": binary(function (a, b) { return a + b; }); break;
+        case "SUB": binary(function (a, b) { return a - b; }); break;
+        case "MUL": binary(function (a, b) { return a * b; }); break;
+        case "DIV": binary(function (a, b) {
+          if (b === 0) throw new VmError("division by zero");
+          return truncDiv(a, b);
+        }); break;
+        case "MOD": binary(function (a, b) {
+          if (b === 0) throw new VmError("division by zero");
+          return a % b;
+        }); break;
+        case "NEG": {
+          var a2 = pop();
+          stack.push(-a2);
+          break;
+        }
+        case "EQ": binary(function (a, b) { return a === b ? 1 : 0; }); break;
+        case "LT": binary(function (a, b) { return a < b ? 1 : 0; }); break;
+        case "GT": binary(function (a, b) { return a > b ? 1 : 0; }); break;
+        case "LOAD": {
+          var slotL = localIndex(op.n);
+          stack.push(locals[slotL]);
+          break;
+        }
+        case "STORE": {
+          var slotS = localIndex(op.n);
+          var v = pop();
+          locals[slotS] = v;
+          break;
+        }
+        case "JMP": nextPc = op.n; break;
+        case "JZ": {
+          var vz = pop();
+          if (vz === 0) nextPc = op.n;
+          break;
+        }
+        case "JNZ": {
+          var vn = pop();
+          if (vn !== 0) nextPc = op.n;
+          break;
+        }
+        case "CALL":
+          callStack.push(nextPc);
+          nextPc = op.n;
+          break;
+        case "RET": {
+          if (callStack.length === 0) {
+            throw new VmError("call stack underflow (RET with no CALL)");
+          }
+          nextPc = callStack.pop();
+          break;
+        }
+        case "PRINT": {
+          if (stack.length === 0) throw new VmError("stack underflow");
+          output.push(String(stack[stack.length - 1]));
+          break;
+        }
+        case "HALT":
+          return { output: output, stack: stack };
+        default:
+          throw new VmError("unknown opcode");
+      }
+
+      if (nextPc < 0 || nextPc > ops.length) {
+        throw new VmError("jump target out of bounds: " + nextPc);
+      }
+      pc = nextPc;
+    }
+  }
+
+  var FACTORIAL_EXAMPLE =
+    "; factorial, computes 5! and prints 120\n" +
+    "PUSH 5\n" +
+    "STORE 0        ; slot 0, n\n" +
+    "PUSH 1\n" +
+    "STORE 1        ; slot 1, result\n" +
+    "loop:\n" +
+    "LOAD 0\n" +
+    "PUSH 0\n" +
+    "GT\n" +
+    "JZ done\n" +
+    "LOAD 1\n" +
+    "LOAD 0\n" +
+    "MUL\n" +
+    "STORE 1\n" +
+    "LOAD 0\n" +
+    "PUSH 1\n" +
+    "SUB\n" +
+    "STORE 0\n" +
+    "JMP loop\n" +
+    "done:\n" +
+    "LOAD 1\n" +
+    "PRINT\n" +
+    "HALT\n";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    var input = document.getElementById("asm-input");
+    var runBtn = document.getElementById("asm-run");
+    var statusEl = document.getElementById("asm-status");
+    var outputEl = document.getElementById("asm-output");
+    var disasmEl = document.getElementById("asm-disasm");
+    var stackEl = document.getElementById("asm-stack");
+
+    if (!input || !runBtn) return;
+
+    function runDemo() {
+      var src = input.value;
+      outputEl.classList.remove("demo-error");
+      statusEl.textContent = "";
+      outputEl.textContent = "-";
+      disasmEl.textContent = "-";
+      stackEl.textContent = "-";
+
+      var ops;
+      try {
+        ops = assemble(src);
+      } catch (e) {
+        outputEl.textContent = "Assemble error, " + e.message;
+        outputEl.classList.add("demo-error");
+        statusEl.textContent = "assemble failed";
+        return;
+      }
+
+      var lines = [];
+      for (var i = 0; i < ops.length; i++) {
+        lines.push(escapeHtml(fmtOp(ops[i], i)));
+      }
+      disasmEl.innerHTML = lines.length ? lines.join("\n") : "(empty program)";
+
+      try {
+        var result = runProgram(ops);
+        outputEl.textContent = result.output.length ? result.output.join("\n") : "(no output)";
+        stackEl.textContent = result.stack.length ? "[" + result.stack.join(", ") + "]" : "(empty)";
+        statusEl.textContent = ops.length + " instructions, ran to HALT";
+      } catch (e) {
+        outputEl.textContent = "Runtime error, " + e.message;
+        outputEl.classList.add("demo-error");
+        statusEl.textContent = "run failed";
+      }
+    }
+
+    runBtn.addEventListener("click", runDemo);
+    input.value = FACTORIAL_EXAMPLE;
+    runDemo();
+  });
+})();
+</script>
 
 </body>
 </html>
