@@ -1,0 +1,15 @@
+[package]
+name = "mirage"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mirage"
+path = "src/main.rs"
+
+[lib]
+name = "mirage"
+path = "src/lib.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }

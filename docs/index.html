@@ -2,11 +2,268 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>mirage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirage: a bytecode virtual machine in Rust</title>
+<meta name="description" content="Mirage is a small bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, readable in one file.">
+<meta name="author" content="Pavan Nallamothu">
+<link rel="canonical" href="https://pavanchow.github.io/mirage/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mirage: a bytecode virtual machine in Rust">
+<meta property="og:description" content="A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.">
+<meta property="og:url" content="https://pavanchow.github.io/mirage/">
+<meta property="og:site_name" content="Mirage">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Mirage",
+  "description": "A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Cross-platform",
+  "url": "https://pavanchow.github.io/mirage/",
+  "author": {
+    "@type": "Person",
+    "name": "Pavan Nallamothu"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --ink: #1d1d1f;
+    --muted: #6e6e73;
+    --line: #e5e5e7;
+    --paper: #ffffff;
+    --panel: #f7f7f8;
+    --accent: #d0021b;
+    --mono: "SF Mono", "Menlo", "Consolas", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  header.hero {
+    padding: 120px 0 80px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: 56px;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 24px;
+    font-weight: 700;
+  }
+  .lede {
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  section {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  section:last-of-type { border-bottom: none; }
+  h2 {
+    font-size: 30px;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+  }
+  p {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 36px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 24px;
+  }
+  .card h3 {
+    font-size: 17px;
+    margin: 0 0 10px;
+  }
+  .card p {
+    font-size: 15px;
+    margin: 0;
+  }
+  pre {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  code {
+    font-family: var(--mono);
+    background: var(--panel);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    font-size: 15px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  td code { background: none; padding: 0; }
+  footer {
+    padding: 48px 0 80px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  @media (max-width: 720px) {
+    h1 { font-size: 38px; }
+    .grid { grid-template-columns: 1fr; }
+    header.hero { padding: 80px 0 56px; }
+  }
+</style>
 </head>
 <body>
-<h1>mirage</h1>
-<p>Site coming soon.</p>
-<p><a href="https://github.com/pavanchow/mirage">View repository</a></p>
+
+<noscript>
+  <p>Mirage is a small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, built to be read in one file.</p>
+</noscript>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Mirage</span>
+    <h1>A bytecode virtual machine<br>in Rust, readable in one file.</h1>
+    <p class="lede">Its own instruction set, a text assembler, and a runner. A value stack, a call stack, local variables, and a compact binary format, with no panics on bad input.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>What it is</h2>
+    <p>Mirage assembles a plain text program into bytecode and runs it on a small stack machine. Push values, do arithmetic, branch on comparisons, call and return from labeled routines, store variables in local slots, print results. The whole pipeline, assembler and executor, fits in a handful of small files.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Text assembler</h3>
+        <p>Labels, integer literals, and comments, parsed in two passes so forward and backward jumps both resolve.</p>
+      </div>
+      <div class="card">
+        <h3>Typed errors</h3>
+        <p>Stack underflow, division by zero, an unknown opcode, an undefined label, all typed errors, never a panic.</p>
+      </div>
+      <div class="card">
+        <h3>Compact bytecode</h3>
+        <p>A fixed 9 bytes per instruction after a short header, simple enough to disassemble by indexing straight into the stream.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Instruction set</h2>
+    <table>
+      <tr><th>Instruction</th><th>Effect</th></tr>
+      <tr><td><code>PUSH n</code></td><td>push integer literal</td></tr>
+      <tr><td><code>POP</code> / <code>DUP</code></td><td>discard or duplicate the top value</td></tr>
+      <tr><td><code>ADD SUB MUL DIV MOD NEG</code></td><td>arithmetic on the top of stack</td></tr>
+      <tr><td><code>EQ LT GT</code></td><td>comparisons, push 1 or 0</td></tr>
+      <tr><td><code>LOAD n</code> / <code>STORE n</code></td><td>read or write local slot n</td></tr>
+      <tr><td><code>JMP JZ JNZ</code></td><td>unconditional and conditional jumps</td></tr>
+      <tr><td><code>CALL</code> / <code>RET</code></td><td>call a labeled routine and return</td></tr>
+      <tr><td><code>PRINT</code> / <code>HALT</code></td><td>print the top value, stop execution</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Sample program</h2>
+    <p>Sum 1 through 10 on the value stack, using two local slots as accumulator and counter.</p>
+    <pre>loop:
+    LOAD 1
+    PUSH 10
+    GT
+    JNZ done
+    LOAD 0
+    LOAD 1
+    ADD
+    STORE 0
+    LOAD 1
+    PUSH 1
+    ADD
+    STORE 1
+    JMP loop
+done:
+    LOAD 0
+    PRINT
+    HALT</pre>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Usage</h2>
+    <pre>mirage run program.asm
+mirage asm program.asm -o program.mbc
+mirage disasm program.mbc</pre>
+    <p>Assemble and run in one step, or produce a bytecode file and disassemble it back to readable instructions.</p>
+  </div>
+</section>
+
+<footer>
+  By Pavan Nallamothu.
+</footer>
+
 </body>
 </html>
