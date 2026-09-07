@@ -1,3 +1,5 @@
+<img src="docs/logo.svg" alt="Mirage logo" width="96">
+
 # Mirage
 
 **A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.**

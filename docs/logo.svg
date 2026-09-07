@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Mirage logo">
+  <!-- value stack: plates growing upward -->
+  <rect x="34" y="86" width="60" height="16" rx="4" fill="#0891b2"/>
+  <rect x="34" y="64" width="60" height="16" rx="4" fill="#06b6d4"/>
+  <rect x="34" y="42" width="60" height="16" rx="4" fill="#22d3ee"/>
+  <!-- top-of-stack pointer -->
+  <path d="M104 50 l14 0 M110 44 l-8 6 8 6" fill="none" stroke="#34d399" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- opcode marks on top plate -->
+  <rect x="42" y="47" width="8" height="6" rx="1.5" fill="#0e2233"/>
+  <rect x="54" y="47" width="16" height="6" rx="1.5" fill="#0e2233" opacity=".65"/>
+</svg>

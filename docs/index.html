@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mirage: a bytecode virtual machine in Rust</title>
+<link rel="icon" type="image/svg+xml" href="logo.svg">
 <meta name="description" content="Mirage is a small bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, readable in one file.">
 <meta name="author" content="Pavan Nallamothu (pavanchow)">
 <link rel="canonical" href="https://pavanchow.github.io/mirage/">
@@ -71,6 +72,9 @@
   .stage{max-width:900px;margin:44px auto 0;padding:0 28px}
   .card{position:relative;background:linear-gradient(180deg,#fffdfb,#fbf5f0);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 1px 0 #fff inset,0 18px 50px -30px rgba(90,50,10,.35);padding:28px}
   .caption{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:16px}
+  .howto{margin-top:20px;text-align:left;border-top:1px solid var(--border,rgba(128,128,128,.2));padding-top:14px}
+  .howto summary{cursor:pointer;font-weight:600;color:var(--muted)}
+  .howto p{margin:12px 0 0;font-size:14px;color:var(--muted);line-height:1.6}
 
   section{padding:92px 0;border-top:1px solid var(--line)}
   h2{font-size:clamp(27px,4.2vw,42px);line-height:1.12;letter-spacing:-.025em;font-weight:660;text-align:center;max-width:760px;margin:0 auto}
@@ -123,6 +127,7 @@
 </div></nav>
 
 <div class="hero">
+  <img src="logo.svg" alt="Mirage logo" width="72" height="72">
   <p class="eyebrow">Rust · own instruction set · one file</p>
   <h1>A bytecode virtual machine<br>readable in one sitting.</h1>
   <p class="sub">Mirage assembles plain text into bytecode and runs it on a small stack machine. Its own instruction set, a text assembler, and a runner, with a value stack, a call stack, local variables, and no panics on bad input.</p>
@@ -158,6 +163,10 @@
       </div>
     </div>
     <p class="caption">assembled and run in your browser, a port of the same assembler and stack machine below, not a server call</p>
+    <details class="howto">
+      <summary>How to use this playground</summary>
+      <p>Write Mirage assembly in the editor (one instruction per line, labels end with <code>:</code>, <code>#</code> starts a comment), then press <strong>Assemble and run</strong>. The panels show program output, the disassembled bytecode, and the final value stack. Start from the sample program below, or try pushing values and combining them with <code>ADD</code>, <code>MUL</code>, and a <code>JZ</code> loop.</p>
+    </details>
   </div>
 </div>
 
