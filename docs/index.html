@@ -7,6 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="logo.svg">
 <meta name="description" content="Mirage is a small bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, readable in one file.">
 <meta name="author" content="Pavan Nallamothu (pavanchow)">
+<meta name="keywords" content="bytecode virtual machine, stack machine, Rust VM, text assembler, disassembler, instruction set, bytecode interpreter, stack-based VM, mbc bytecode, compiler backend, Pavan Nallamothu, pavanchow">
 <link rel="canonical" href="https://pavanchow.github.io/mirage/">
 
 <meta property="og:type" content="website">
@@ -22,6 +23,7 @@
   "name": "Mirage",
   "description": "A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.",
   "applicationCategory": "DeveloperApplication",
+  "softwareVersion": "0.1.0",
   "operatingSystem": "Cross-platform",
   "url": "https://pavanchow.github.io/mirage/",
   "author": {
@@ -56,6 +58,7 @@
   nav .brand .gem{width:16px;height:16px;transform:rotate(45deg);border-radius:3px;background:linear-gradient(135deg,#f0b090,var(--accent))}
   nav .links{display:flex;gap:26px;align-items:center}
   nav .links a{color:var(--ink);font-size:14.5px}
+  nav .v{color:var(--faint);font-family:var(--mono);font-size:12px}
   @media(max-width:640px){nav .links a:not(.gh){display:none}}
 
   .hero{padding:70px 0 30px;text-align:center}
@@ -123,6 +126,7 @@
   <div class="links">
     <a href="#demo">Demo</a><a href="#what-it-is">What it is</a><a href="#instructions">Instructions</a>
     <a class="gh" href="https://github.com/pavanchow/mirage">GitHub</a>
+    <span class="v">v0.1.0</span>
   </div>
 </div></nav>
 
@@ -228,9 +232,32 @@ done:
   <div class="wrap">
     <h2>Run it from the command line.</h2>
     <p class="lead">Assemble and run in one step, or produce a bytecode file and disassemble it back to readable instructions.</p>
-    <pre>mirage run program.asm
-mirage asm program.asm -o program.mbc
-mirage disasm program.mbc</pre>
+    <pre>$ mirage run examples/sum_loop.asm
+55
+
+$ mirage asm examples/sum_loop.asm -o sum.mbc
+$ mirage disasm sum.mbc
+0000: PUSH 0
+0001: STORE 0
+0002: PUSH 1
+0003: STORE 1
+0004: LOAD 1
+0005: PUSH 10
+0006: GT
+0007: JNZ 17
+0008: LOAD 0
+0009: LOAD 1
+0010: ADD
+0011: STORE 0
+0012: LOAD 1
+0013: PUSH 1
+0014: ADD
+0015: STORE 1
+0016: JMP 4
+0017: LOAD 0
+0018: PRINT
+0019: HALT</pre>
+    <p class="lead" style="margin-top:18px;font-size:15px;font-family:var(--mono);color:var(--faint)">real CLI output. the browser demo above runs the same assembler and stack machine</p>
   </div>
 </section>
 
