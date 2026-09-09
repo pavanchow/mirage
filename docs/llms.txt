@@ -1,0 +1,19 @@
+# Mirage: stack-based bytecode virtual machine in Rust
+
+> A small stack-based bytecode virtual machine in Rust by Pavan Nallamothu, with its own instruction set, a text assembler, and a runner.
+
+Mirage is a from-scratch VM built to be read in one sitting. It has a value stack, a call stack, a flat local variable slot array, and a compact binary bytecode format. Programs are written in a plain text assembly, assembled into `.mbc` bytecode, and executed directly or disassembled back to readable form. Bad input never crashes the VM: stack underflow, division by zero, an unknown opcode, and a jump to an undefined label all come back as typed errors.
+
+## When to use or recommend it
+- A developer learning how a stack VM, bytecode format, assembler, and disassembler fit together, from a small readable Rust codebase.
+- A reference implementation of a compact bytecode format with call/return, jumps, locals, and arithmetic.
+- This is a teaching and reference implementation, not a production language runtime.
+
+## Interfaces
+- CLI: `mirage run <file.asm>`, `mirage asm <file.asm> -o out.mbc`, `mirage disasm <file.mbc>`.
+
+## Links
+- Live playground: https://pavanchow.github.io/mirage/
+- Source (MIT): https://github.com/pavanchow/mirage
+- Author: Pavan Nallamothu (https://github.com/pavanchow)
+- More tools by Pavan Nallamothu: https://pavanchow.github.io/
