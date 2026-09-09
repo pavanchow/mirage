@@ -3,43 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mirage: a bytecode virtual machine in Rust</title>
+<title>Mirage: bytecode virtual machine in Rust | Pavan Nallamothu</title>
 <link rel="icon" type="image/svg+xml" href="logo.svg">
-<meta name="description" content="Mirage is a small bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, readable in one file.">
-<meta name="author" content="Pavan Nallamothu (pavanchow)">
-<meta name="keywords" content="bytecode virtual machine, stack machine, Rust VM, text assembler, disassembler, instruction set, bytecode interpreter, stack-based VM, mbc bytecode, compiler backend, Pavan Nallamothu, pavanchow">
+<meta name="description" content="Mirage, a small stack-based bytecode virtual machine in Rust with its own instruction set, a text assembler, and a runner, readable in one file. By Pavan Nallamothu.">
+<meta name="keywords" content="bytecode virtual machine, stack machine, Rust VM, text assembler, disassembler, instruction set, bytecode interpreter, stack-based VM, virtual machine from scratch, compiler backend, interpreter Rust, opcode dispatch, Pavan Nallamothu, pavanchow">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="author" content="Pavan Nallamothu">
+<link rel="author" href="https://github.com/pavanchow">
 <link rel="canonical" href="https://pavanchow.github.io/mirage/">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Mirage: a bytecode virtual machine in Rust">
-<meta property="og:description" content="A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.">
+<meta property="og:site_name" content="Pavan Nallamothu">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="Mirage: bytecode virtual machine in Rust | Pavan Nallamothu">
+<meta property="og:description" content="A small stack-based bytecode virtual machine in Rust with its own instruction set, a text assembler, and a runner, readable in one file. By Pavan Nallamothu.">
 <meta property="og:url" content="https://pavanchow.github.io/mirage/">
-<meta property="og:site_name" content="Mirage">
+<meta property="og:image" content="https://pavanchow.github.io/mirage/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mirage by Pavan Nallamothu">
 
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mirage: a bytecode virtual machine in Rust">
-<meta name="twitter:description" content="A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@pavanchow">
+<meta name="twitter:creator" content="@pavanchow">
+<meta name="twitter:title" content="Mirage: bytecode virtual machine in Rust | Pavan Nallamothu">
+<meta name="twitter:description" content="A small stack-based bytecode virtual machine in Rust with its own instruction set, a text assembler, and a runner. By Pavan Nallamothu.">
+<meta name="twitter:image" content="https://pavanchow.github.io/mirage/og-image.png">
 
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Mirage",
-  "description": "A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.",
-  "applicationCategory": "DeveloperApplication",
-  "softwareVersion": "0.1.0",
-  "operatingSystem": "Cross-platform",
-  "url": "https://pavanchow.github.io/mirage/",
-  "author": {
-    "@type": "Person",
-    "name": "Pavan Nallamothu"
-  },
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  }
-}
+{"@context":"https://schema.org","@graph":[{"@type":"SoftwareApplication","@id":"https://pavanchow.github.io/mirage/#software","name":"Mirage","applicationCategory":"DeveloperApplication","operatingSystem":"Cross-platform","description":"A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner, readable in one file.","url":"https://pavanchow.github.io/mirage/","image":"https://pavanchow.github.io/mirage/og-image.png","softwareVersion":"0.1.0","programmingLanguage":"Rust","codeRepository":"https://github.com/pavanchow/mirage","datePublished":"2026-08-21","author":{"@id":"https://github.com/pavanchow#person"},"publisher":{"@id":"https://github.com/pavanchow#person"},"keywords":"bytecode virtual machine, stack machine, Rust VM, text assembler, instruction set, bytecode interpreter","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Stack-based bytecode virtual machine","Custom instruction set","Text assembler","Bytecode runner","Readable in a single file"]},{"@type":"Person","@id":"https://github.com/pavanchow#person","name":"Pavan Nallamothu","alternateName":"pavanchow","url":"https://github.com/pavanchow","jobTitle":"Software Engineer and Security Researcher","knowsAbout":["Rust","virtual machines","bytecode interpreters","instruction set design","compilers","systems programming"],"sameAs":["https://github.com/pavanchow","https://hackerone.com/pavanchow"]},{"@type":"WebSite","@id":"https://pavanchow.github.io/mirage/#website","name":"Mirage by Pavan Nallamothu","url":"https://pavanchow.github.io/mirage/","author":{"@id":"https://github.com/pavanchow#person"},"inLanguage":"en"},{"@type":"BreadcrumbList","@id":"https://pavanchow.github.io/mirage/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Pavan Nallamothu","item":"https://github.com/pavanchow"},{"@type":"ListItem","position":2,"name":"Mirage","item":"https://pavanchow.github.io/mirage/"}]},{"@type":"WebPage","@id":"https://pavanchow.github.io/mirage/#webpage","url":"https://pavanchow.github.io/mirage/","name":"Mirage: bytecode virtual machine in Rust | Pavan Nallamothu","isPartOf":{"@id":"https://pavanchow.github.io/mirage/#website"},"about":{"@id":"https://pavanchow.github.io/mirage/#software"},"author":{"@id":"https://github.com/pavanchow#person"},"inLanguage":"en"}]}
 </script>
 
 <style>
@@ -123,10 +115,6 @@
     .pill.secondary,#asm-input{background:#131318}
   }
 </style>
-<link rel="author" href="https://github.com/pavanchow">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Pavan Nallamothu","alternateName":"pavanchow","url":"https://github.com/pavanchow","sameAs":["https://github.com/pavanchow","https://hackerone.com/pavanchow"]}
-</script>
 </head>
 <body>
 
@@ -278,6 +266,17 @@ $ mirage disasm sum.mbc
   <p>A bytecode virtual machine you can read end to end.</p>
   <p style="margin-top:12px"><a href="https://github.com/pavanchow/mirage">github.com/pavanchow/mirage</a></p>
   <p style="margin-top:12px">By <span class="name">Pavan Nallamothu</span>.</p>
+  <div style="max-width:760px;margin:40px auto 0;text-align:left">
+    <p style="text-align:center;font-weight:600;color:var(--ink);margin-bottom:16px">More open-source tools by Pavan Nallamothu</p>
+    <ul style="list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px 28px;padding:0;font-size:14.5px">
+      <li><a href="https://pavanchow.github.io/alchemist/">Alchemist</a>: a compiler that lowers a language to stack bytecode, then runs it on a VM</li>
+      <li><a href="https://pavanchow.github.io/kindling/">Kindling</a>: a dynamically typed language with a bytecode compiler and stack-based VM</li>
+      <li><a href="https://pavanchow.github.io/phantom/">Phantom</a>: a CHIP-8 emulator with a fully unit-tested CPU core</li>
+      <li><a href="https://pavanchow.github.io/whetstone/">Whetstone</a>: a compiler optimizer with constant folding and propagation</li>
+      <li><a href="https://pavanchow.github.io/sprite/">Sprite</a>: a tiny embeddable scripting language with a tree-walking interpreter</li>
+    </ul>
+    <p style="text-align:center;margin-top:22px"><a href="https://github.com/pavanchow">All projects on GitHub: github.com/pavanchow</a></p>
+  </div>
 </footer>
 
 <script>
