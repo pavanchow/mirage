@@ -16,6 +16,10 @@
 <meta property="og:url" content="https://pavanchow.github.io/mirage/">
 <meta property="og:site_name" content="Mirage">
 
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mirage: a bytecode virtual machine in Rust">
+<meta name="twitter:description" content="A small stack-based bytecode virtual machine in Rust, with its own instruction set, a text assembler, and a runner.">
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -109,6 +113,15 @@
   .demo-output-block h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px;font-weight:600;font-family:var(--mono)}
   .demo-output-block pre{margin:0;max-width:none;max-height:130px;overflow-y:auto;font-size:12.5px}
   #asm-output.demo-error{color:var(--accent)}
+
+  @media(prefers-color-scheme:dark){
+    :root{--accent:#f97316;--accent-soft:#2a1710;--ink:#f2f2f6;--muted:#a0a3ad;--faint:#767a8b;--line:#26262c;--panel:#17171c;--panel2:#141419}
+    body{background:#0a0a0c}
+    nav{background:rgba(10,10,12,.82)}
+    .card{background:linear-gradient(180deg,#141019,#0f0c11)}
+    .pill.primary,#asm-run{color:#0a0a0c}
+    .pill.secondary,#asm-input{background:#131318}
+  }
 </style>
 <link rel="author" href="https://github.com/pavanchow">
 <script type="application/ld+json">
@@ -169,7 +182,7 @@
     <p class="caption">assembled and run in your browser, a port of the same assembler and stack machine below, not a server call</p>
     <details class="howto">
       <summary>How to use this playground</summary>
-      <p>Write Mirage assembly in the editor (one instruction per line, labels end with <code>:</code>, <code>#</code> starts a comment), then press <strong>Assemble and run</strong>. The panels show program output, the disassembled bytecode, and the final value stack. Start from the sample program below, or try pushing values and combining them with <code>ADD</code>, <code>MUL</code>, and a <code>JZ</code> loop.</p>
+      <p>Write Mirage assembly in the editor (one instruction per line, labels end with <code>:</code>, <code>;</code> starts a comment), then press <strong>Assemble and run</strong>. The panels show program output, the disassembled bytecode, and the final value stack. Start from the sample program below, or try pushing values and combining them with <code>ADD</code>, <code>MUL</code>, and a <code>JZ</code> loop.</p>
     </details>
   </div>
 </div>
