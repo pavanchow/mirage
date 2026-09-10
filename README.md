@@ -6,6 +6,8 @@ Mirage is a small stack-based bytecode virtual machine written from scratch in R
 
 **[Live demo](https://pavanchow.github.io/mirage/)** · MIT licensed · written in Rust
 
+Built from scratch by [Pavan Nallamothu](https://pavanchow.github.io/) ([LinkedIn](https://www.linkedin.com/in/pavanchow/), [GitHub](https://github.com/pavanchow)).
+
 Mirage is a from-scratch VM built to be read in one sitting. It has a value stack, a call stack, a flat local variable slot array, and a compact binary bytecode format. Programs are written in a plain text assembly, assembled into `.mbc` bytecode, and executed directly or disassembled back to readable form. Bad input never crashes the VM. Stack underflow, division by zero, an unknown opcode, and a jump to an undefined label all come back as typed errors.
 
 ## Instruction set
